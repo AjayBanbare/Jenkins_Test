@@ -4,12 +4,14 @@ pipeline {
     stages {
         stage('Clone Code') {
             steps {
-                git 'https://github.com/your-username/springboot-static-site.git'
+                // point at *your* GitHub repo and branch
+                git branch: 'main', url: 'https://github.com/AjayBanbare/Jenkins_Test.git'
             }
         }
 
         stage('Build') {
             steps {
+                // use your wrapper if present, otherwise plain mvn
                 sh './mvnw clean package || mvn clean package'
             }
         }
@@ -17,8 +19,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                pkill -f "springboot-static-site" || true
-                nohup java -jar target/*.jar > output.log 2>&1 &
+                echo "🔁 Stopping any existing Spring Boot process..."
+                pkill -f "java -jar" || true
+
+                echo "🚀 Starting new Spring Boot app..."
+                nohup java -jar target/*.jar > app.log 2>&1 &
                 '''
             }
         }
