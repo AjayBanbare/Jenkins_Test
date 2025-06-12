@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Code') {
+            steps {
+                git 'https://github.com/your-username/springboot-static-site.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './mvnw clean package || mvn clean package'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                pkill -f "springboot-static-site" || true
+                nohup java -jar target/*.jar > output.log 2>&1 &
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment Successful!'
+        }
+        failure {
+            echo '❌ Deployment Failed!'
+        }
+    }
+}
